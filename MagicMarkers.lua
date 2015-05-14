@@ -51,6 +51,10 @@ local markerEnum = {
   ["Star"] = 21,
   ["Moon"] = 22,
   ["Planet"] = 23,
+  ["North"] = 24,
+  ["East"] = 25,
+  ["South"] = 26,
+  ["West"] = 27,
 }
 
 local markers = {
@@ -205,6 +209,34 @@ local markers = {
   Planet = {
     name = "Planet",
     sprite = "MagicMarkersSprites:Planet_256",
+    pixieId = nil,
+    location = nil,
+    options = { w = 20, h = 20}
+  },
+  North = {
+    name = "North",
+    sprite = "MagicMarkersSprites:LetterN_256",
+    pixieId = nil,
+    location = nil,
+    options = { w = 20, h = 20}
+  },
+  East = {
+    name = "East",
+    sprite = "MagicMarkersSprites:LetterE_256",
+    pixieId = nil,
+    location = nil,
+    options = { w = 20, h = 20}
+  },
+  South = {
+    name = "South",
+    sprite = "MagicMarkersSprites:LetterS_256",
+    pixieId = nil,
+    location = nil,
+    options = { w = 20, h = 20}
+  },
+  West = {
+    name = "West",
+    sprite = "MagicMarkersSprites:LetterW_256",
     pixieId = nil,
     location = nil,
     options = { w = 20, h = 20}
@@ -388,6 +420,12 @@ function MagicMarkers:OnToggleMagicMarkers()
     self.state.isOpen = true
     self.state.windows.main:Invoke() -- show the window
   end
+end
+
+function MagicMarkers:OnMagicMarkersClose()
+  self.state.isOpen = false
+  self:SaveLocation()
+  self:CloseMain()
 end
 
 function MagicMarkers:SaveLocation()
@@ -695,6 +733,47 @@ function MagicMarkers:OnRestore(eType, tSavedData)
       self.settings[key] = deepcopy(tDefaultSettings[key])
     end
   end
+
+  -- Check to see if there are any profiles, if there are not then load the default profiles
+  if #self.settings.savedProfiles <= 0 then
+    self:LoadDefaultProfiles()
+  end
+end
+
+function MagicMarkers:LoadDefaultProfiles()
+  local profiles = {
+    [1] = {
+      name = "Kuralak",
+      markers = {
+        [1] = "North;206.6851348877;-111.44667053223;-555.53625488281;MagicMarkersSprites:LetterN_256",
+        [2] = "Bomb;162.05693054199;-112.09367370605;-477.77438354492;Icon_Windows_UI_CRB_Marker_Bomb",
+        [3] = "Pig;175.57383728027;-112.08802032471;-478.5954284668;Icon_Windows_UI_CRB_Marker_Pig",
+        [4] = "Toaster;182.1371307373;-112.09367370605;-482.68237304688;Icon_Windows_UI_CRB_Marker_Toaster",
+        [5] = "Octopus;184.51776123047;-112.09367370605;-489.25350952148;Icon_Windows_UI_CRB_Marker_Octopus",
+        [6] = "UFO;181.76831054688;-112.08521270752;-496.77624511719;Icon_Windows_UI_CRB_Marker_UFO",
+        [7] = "Mask;176.64668273926;-112.09366607666;-501.96658325195;Icon_Windows_UI_CRB_Marker_Mask",
+        [8] = "Ghost;162.85749816895;-112.09367370605;-501.84780883789;Icon_Windows_UI_CRB_Marker_Ghost",
+        [9] = "Chicken;154.77198791504;-112.09367370605;-489.76553344727;Icon_Windows_UI_CRB_Marker_Chicken"
+      }
+    },
+    [2] = {
+      name = "Phage Maw",
+      markers = {
+        [1] = "Star;3734.1630859375;-306.59585571289;-125.1821975708;MagicMarkersSprites:Star_256"
+      }
+    },
+    [3] = {
+      name = "Ohmna",
+      markers = {
+        [1] = "Bomb;2814.2836914063;-448.78671264648;-105.99939727783;Icon_Windows_UI_CRB_Marker_Bomb",
+        [2] = "Chicken;2774.5405273438;-448.78659057617;-108.68078613281;Icon_Windows_UI_CRB_Marker_Chicken",
+        [3] = "Ghost;2791.1359863281;-448.78634643555;-145.60018920898;Icon_Windows_UI_CRB_Marker_Ghost",
+        [4] = "UFO;2814.9113769531;-448.78454589844;-126.84462738037;Icon_Windows_UI_CRB_Marker_UFO"
+      }
+    }
+  }
+
+  self.settings.savedProfiles = deepcopy(profiles)
 end
 
 -----------------------------------------------------------------------------------------------
