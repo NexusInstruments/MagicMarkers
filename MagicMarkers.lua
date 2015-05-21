@@ -243,6 +243,38 @@ local markers = {
   }
 }
 
+local tDefaultProfiles = {
+  [1] = {
+    name = "Kuralak",
+    markers = {
+      [1] = "North;206.6851348877;-111.44667053223;-555.53625488281;MagicMarkersSprites:LetterN_256",
+      [2] = "Bomb;162.05693054199;-112.09367370605;-477.77438354492;Icon_Windows_UI_CRB_Marker_Bomb",
+      [3] = "Pig;175.57383728027;-112.08802032471;-478.5954284668;Icon_Windows_UI_CRB_Marker_Pig",
+      [4] = "Toaster;182.1371307373;-112.09367370605;-482.68237304688;Icon_Windows_UI_CRB_Marker_Toaster",
+      [5] = "Octopus;184.51776123047;-112.09367370605;-489.25350952148;Icon_Windows_UI_CRB_Marker_Octopus",
+      [6] = "UFO;181.76831054688;-112.08521270752;-496.77624511719;Icon_Windows_UI_CRB_Marker_UFO",
+      [7] = "Mask;176.64668273926;-112.09366607666;-501.96658325195;Icon_Windows_UI_CRB_Marker_Mask",
+      [8] = "Ghost;162.85749816895;-112.09367370605;-501.84780883789;Icon_Windows_UI_CRB_Marker_Ghost",
+      [9] = "Chicken;154.77198791504;-112.09367370605;-489.76553344727;Icon_Windows_UI_CRB_Marker_Chicken"
+    }
+  },
+  [2] = {
+    name = "Phage Maw",
+    markers = {
+      [1] = "Star;3734.1630859375;-306.59585571289;-125.1821975708;MagicMarkersSprites:Star_256"
+    }
+  },
+  [3] = {
+    name = "Ohmna",
+    markers = {
+      [1] = "Bomb;2814.2836914063;-448.78671264648;-105.99939727783;Icon_Windows_UI_CRB_Marker_Bomb",
+      [2] = "Chicken;2774.5405273438;-448.78659057617;-108.68078613281;Icon_Windows_UI_CRB_Marker_Chicken",
+      [3] = "Ghost;2791.1359863281;-448.78634643555;-145.60018920898;Icon_Windows_UI_CRB_Marker_Ghost",
+      [4] = "UFO;2814.9113769531;-448.78454589844;-126.84462738037;Icon_Windows_UI_CRB_Marker_UFO"
+    }
+  }
+}
+
 local tDefaultSettings = {
   version = MAGICMARKERS_CURRENT_VERSION,
   user = {
@@ -403,6 +435,8 @@ function MagicMarkers:OnMagicMarkersOn(cmd, params)
     self.frameTimer:Set(args[2])
 
     return
+  elseif args[1] == "defaults" then
+    self:LoadDefaultProfiles()
   else
     self:OnToggleMagicMarkers()
   end
@@ -426,6 +460,13 @@ function MagicMarkers:OnMagicMarkersClose()
   self.state.isOpen = false
   self:SaveLocation()
   self:CloseMain()
+end
+
+-----------------------------------------------------------------------------------------------
+-- MagicMarkers OnMove
+-----------------------------------------------------------------------------------------------
+function MagicMarkers:OnMagicMarkersMove()
+  self:SaveLocation()
 end
 
 function MagicMarkers:SaveLocation()
@@ -559,11 +600,12 @@ end
 function MagicMarkers:ShowOptions(wndHandler, wndControl, eMouseButton)
   if self.state.isOptionsOpen then
     self.state.isOptionsOpen = false
+
   else
     self.state.isOptionsOpen = true
     self:LoadMarkerOptions(wndHandler, self.state.windows.options:FindChild("Marker"), eMouseButton)
   end
-  self.state.windows.options:Show(self.state.isOptionsOpen , true)
+  self.state.windows.options:Show(self.state.isOptionsOpen, true)
 end
 
 function MagicMarkers:LoadMarkerOptions(wndHandler, wndControl, eMouseButton)
@@ -581,15 +623,13 @@ function MagicMarkers:OnChangeMarkerSize(wndHandler, wndControl, strText)
   if value ~= nil then
     self.settings.options.buttons.w = value
     self.settings.options.buttons.h = value
+  else
+    wndControl:SetText(tostring(self.settings.options.buttons.w))
   end
 end
 
 function MagicMarkers:OnChangeShareMarker(wndHandler, wndControl, eMouseButton)
-  if wndControl:IsChecked() then
-    self.settings.options.shareMarker = true
-  else
-    self.settings.options.shareMarker = true
-  end
+  self.settings.options.shareMarker = wndControl:IsChecked()
 end
 
 function MagicMarkers:LoadProfileOptions()
@@ -647,7 +687,7 @@ end
 function MagicMarkers:LoadProfile(wndHandler, wndControl, eMouseButton)
   local profileName  = wndControl:GetText()
   local profile
-  for _, temp in pairs(self.settings.savedProfiles) do
+  for key, temp in pairs(self.settings.savedProfiles) do
     if temp.name == profileName then
       profile = temp
     end
@@ -713,67 +753,40 @@ end
 -----------------------------------------------------------------------------------------------
 -- MagicMarkers Event Handler
 -----------------------------------------------------------------------------------------------
-function MagicMarkers:OnSave(eLevel)
-  if eLevel ~= GameLib.CodeEnumAddonSaveLevel.Character then return end
+function MagicMarkers:OnSave(eType)
+  if eType ~= GameLib.CodeEnumAddonSaveLevel.Character then return end
   return deepcopy(self.settings)
 end
 
 function MagicMarkers:OnRestore(eType, tSavedData)
-  if eLevel ~= GameLib.CodeEnumAddonSaveLevel.Character then return end
+  if eType ~= GameLib.CodeEnumAddonSaveLevel.Character then return end
 
   if tSavedData and tSavedData.user then
     -- Copy the settings wholesale
     self.settings = deepcopy(tSavedData)
-  end
 
-  -- Fill in any missing values from the default options
-  -- This Protects us from configuration additions in the future versions
-  for key, value in pairs(tDefaultSettings) do
-    if self.settings[key] == nil then
-      self.settings[key] = deepcopy(tDefaultSettings[key])
+    -- Fill in any missing values from the default options
+    -- This Protects us from configuration additions in the future versions
+    for key, value in pairs(tDefaultSettings) do
+      if self.settings[key] == nil then
+        self.settings[key] = deepcopy(tDefaultSettings[key])
+      end
     end
-  end
 
-  -- Check to see if there are any profiles, if there are not then load the default profiles
-  if #self.settings.savedProfiles <= 0 then
-    self:LoadDefaultProfiles()
+    -- Check to see if there are any profiles, if there are not then load the default profiles
+    if #self.settings.savedProfiles <= 0 then
+      self.settings.savedProfiles = deepcopy(tDefaultProfiles)
+    end
+
+    self.settings.user.version = MAGICMARKERS_CURRENT_VERSION
+
+    self:RefreshUI()
   end
 end
 
 function MagicMarkers:LoadDefaultProfiles()
-  local profiles = {
-    [1] = {
-      name = "Kuralak",
-      markers = {
-        [1] = "North;206.6851348877;-111.44667053223;-555.53625488281;MagicMarkersSprites:LetterN_256",
-        [2] = "Bomb;162.05693054199;-112.09367370605;-477.77438354492;Icon_Windows_UI_CRB_Marker_Bomb",
-        [3] = "Pig;175.57383728027;-112.08802032471;-478.5954284668;Icon_Windows_UI_CRB_Marker_Pig",
-        [4] = "Toaster;182.1371307373;-112.09367370605;-482.68237304688;Icon_Windows_UI_CRB_Marker_Toaster",
-        [5] = "Octopus;184.51776123047;-112.09367370605;-489.25350952148;Icon_Windows_UI_CRB_Marker_Octopus",
-        [6] = "UFO;181.76831054688;-112.08521270752;-496.77624511719;Icon_Windows_UI_CRB_Marker_UFO",
-        [7] = "Mask;176.64668273926;-112.09366607666;-501.96658325195;Icon_Windows_UI_CRB_Marker_Mask",
-        [8] = "Ghost;162.85749816895;-112.09367370605;-501.84780883789;Icon_Windows_UI_CRB_Marker_Ghost",
-        [9] = "Chicken;154.77198791504;-112.09367370605;-489.76553344727;Icon_Windows_UI_CRB_Marker_Chicken"
-      }
-    },
-    [2] = {
-      name = "Phage Maw",
-      markers = {
-        [1] = "Star;3734.1630859375;-306.59585571289;-125.1821975708;MagicMarkersSprites:Star_256"
-      }
-    },
-    [3] = {
-      name = "Ohmna",
-      markers = {
-        [1] = "Bomb;2814.2836914063;-448.78671264648;-105.99939727783;Icon_Windows_UI_CRB_Marker_Bomb",
-        [2] = "Chicken;2774.5405273438;-448.78659057617;-108.68078613281;Icon_Windows_UI_CRB_Marker_Chicken",
-        [3] = "Ghost;2791.1359863281;-448.78634643555;-145.60018920898;Icon_Windows_UI_CRB_Marker_Ghost",
-        [4] = "UFO;2814.9113769531;-448.78454589844;-126.84462738037;Icon_Windows_UI_CRB_Marker_UFO"
-      }
-    }
-  }
-
-  self.settings.savedProfiles = deepcopy(profiles)
+  self.settings.savedProfiles = deepcopy(tDefaultProfiles)
+  self:LoadProfileOptions()
 end
 
 -----------------------------------------------------------------------------------------------
