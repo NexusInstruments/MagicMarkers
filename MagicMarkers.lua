@@ -22,7 +22,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local MAGICMARKERS_CURRENT_VERSION = "1.0.0"
+local MAGICMARKERS_CURRENT_VERSION = "1.1.0"
 
 -----------------------------------------------------------------------------------------------
 -- Constants
@@ -281,7 +281,9 @@ local tDefaultSettings = {
     savedWndLoc = {}
   },
   options = {
-    shareMarker = true,
+    shareMarkerRaid = true,
+    shareMarekrParty = true,
+    frameSkip = 2,
     buttons = {
       w = 48,
       h = 48
@@ -293,6 +295,8 @@ local tDefaultSettings = {
 local tDefaultState = {
   isOpen = false,
   isOptionsOpen = false,
+  isLoaded = false,
+  frameCount = 0,
   windows = {
     main = nil,
     options = nil,
@@ -318,6 +322,7 @@ function MagicMarkers:new(o)
 end
 
 function MagicMarkers:Init()
+  self.state.isLoaded = false
   local bHasConfigureFunction = false
   local strConfigureButtonText = ""
   local tDependencies = {
@@ -353,8 +358,11 @@ function MagicMarkers:OnLoad()
   Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 
   -- Setup Comms
-  self.shareChannel = ICCommLib.JoinChannel("MagicMarkers", ICCommLib.CodeEnumICCommChannelType.Raid)
-  self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
+  self.shareChannelRaid = ICCommLib.JoinChannel("MagicMarkersRaid", ICCommLib.CodeEnumICCommChannelType.Raid)
+  self.shareChannelRaid:SetReceivedMessageFunction("OnReceiveMarker", self)
+
+  self.shareChannelParty = ICCommLib.JoinChannel("MagicMarkersParty", ICCommLib.CodeEnumICCommChannelType.Party)
+  self.shareChannelParty:SetReceivedMessageFunction("OnReceiveMarker", self)
 
   -- Interface Menu
   Apollo.RegisterEventHandler("Generic_ToggleMagicMarkers", "OnToggleMagicMarkers", self)
@@ -383,14 +391,15 @@ function MagicMarkers:OnDocLoaded()
   -- This update event is strange, and fires off intermittently
   -- Apollo.RegisterEventHandler("VarChange_FrameCount", "OnNextFrame", self)
   -- This update event is smooth, but probably horribly inefficient
-  -- Apollo.RegisterEventHandler("NextFrame", "OnNextFrame", self)
+  Apollo.RegisterEventHandler("NextFrame", "OnNextFrame", self)
   -- This update event is customizable, but still doesn't fix fps lag
-  self.timerFreq = .03
-  self.frameTimer = ApolloTimer.Create(self.timerFreq, true, "OnNextFrame", self)
+  --self.timerFreq = .03
+  --self.frameTimer = ApolloTimer.Create(self.timerFreq, true, "OnNextFrame", self)
 
   -- Do additional Addon initialization here
   self.state.windows.main:Show(self.state.isOpen, true)
   self.state.windows.options:Show(self.state.isOptionsOpen, true)
+  self.state.isLoaded = true
 end
 
 -----------------------------------------------------------------------------------------------
@@ -486,7 +495,16 @@ end
 
 -- on timer
 function MagicMarkers:OnNextFrame()
-  self:DrawMarkers()
+  if self.state.isLoaded then
+    self.state.frameCount = self.state.frameCount + 1
+    -- Only update every Nth frame
+    if self.state.frameCount == nil then self.state.frameCount = 0 end
+
+    if (self.state.frameCount > self.settings.options.frameSkip) then
+      self.state.frameCount = 0
+      self:DrawMarkers()
+    end
+  end
 end
 
 function MagicMarkers:DrawMarkers()
@@ -529,9 +547,16 @@ end
 -- MagicMarkersForm Communication Functions
 -----------------------------------------------------------------------------------------------
 function MagicMarkers:ShareMarker(marker)
-  if GroupLib.GetMemberCount() > 0 and self.settings.options.shareMarker then
+  if GroupLib.GetMemberCount() > 0 then
     msg = self:MarkerToString(marker)
-    self.shareChannel:SendMessage(msg)
+    -- Sends the Markers to the Raid
+    if self.settings.options.shareMarkerRaid then
+      self.shareChannelRaid:SendMessage(msg)
+    end
+    -- Sends the Markers to the Party
+    if self.settings.options.shareMarekrParty then
+      self.shareChannelParty:SendMessage(msg)
+    end
   end
 end
 
@@ -615,7 +640,9 @@ function MagicMarkers:LoadMarkerOptions(wndHandler, wndControl, eMouseButton)
   container:DestroyChildren()
   local form = Apollo.LoadForm(self.xmlDoc, "MarkerOptions", container, self)
   form:FindChild("MarkerSize"):SetText(self.settings.options.buttons.w)
-  form:FindChild("Share"):SetCheck(self.settings.options.shareMarker)
+  form:FindChild("ShareRaid"):SetCheck(self.settings.options.shareMarkerRaid)
+  form:FindChild("ShareParty"):SetCheck(self.settings.options.shareMarkerParty)
+  form:FindChild("FrameSkip"):FindChild("Text"):SetText(self.settings.options.frameSkip)
 end
 
 function MagicMarkers:OnChangeMarkerSize(wndHandler, wndControl, strText)
@@ -628,8 +655,12 @@ function MagicMarkers:OnChangeMarkerSize(wndHandler, wndControl, strText)
   end
 end
 
-function MagicMarkers:OnChangeShareMarker(wndHandler, wndControl, eMouseButton)
-  self.settings.options.shareMarker = wndControl:IsChecked()
+function MagicMarkers:OnChangeShareMarkerRaid(wndHandler, wndControl, eMouseButton)
+  self.settings.options.shareMarkerRaid = wndControl:IsChecked()
+end
+
+function MagicMarkers:OnChangeShareMarkerParty(wndHandler, wndControl, eMouseButton)
+  self.settings.options.shareMarkerParty = wndControl:IsChecked()
 end
 
 function MagicMarkers:LoadProfileOptions()
@@ -707,6 +738,38 @@ function MagicMarkers:LoadProfile(wndHandler, wndControl, eMouseButton)
   end
 end
 
+function MagicMarkers:DecFrameSkip( wndHandler, wndControl, eMouseButton )
+  local par = wndHandler:GetParent()
+  local txt = par:FindChild("Text")
+  local str = txt:GetText()
+  local value = tonumber(str)
+  if value ~= nil then
+    if value > 0 then
+      value = value - 1
+    end
+  else
+    value = 0
+  end
+  txt:SetText(tostring(value))
+  self.settings.options.frameSkip = value
+end
+
+function MagicMarkers:IncFrameSkip( wndHandler, wndControl, eMouseButton )
+  local par = wndHandler:GetParent()
+  local txt = par:FindChild("Text")
+  local str = txt:GetText()
+  local value = tonumber(str)
+  if value ~= nil then
+    if value < 20 then
+      value = value + 1
+    end
+  else
+    value = 0
+  end
+  txt:SetText(tostring(value))
+  self.settings.options.frameSkip = value
+end
+
 function MagicMarkers:GetProfileIndex(profileName)
   local index = nil
   local counter = 1
@@ -764,6 +827,14 @@ function MagicMarkers:OnRestore(eType, tSavedData)
   if tSavedData and tSavedData.user then
     -- Copy the settings wholesale
     self.settings = deepcopy(tSavedData)
+
+    -- Convert old settings
+    if self.settings.user.version == "1.0.0" then
+      self.settings.options.shareMarkerRaid = self.settings.options.shareMarker
+      self.settings.options.shareMarkerParty = true
+      self.settings.options.frameSkip = 2
+      self.settings.options.shareMarker = nil
+    end
 
     -- Fill in any missing values from the default options
     -- This Protects us from configuration additions in the future versions
