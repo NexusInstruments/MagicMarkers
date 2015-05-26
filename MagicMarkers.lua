@@ -22,7 +22,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local MAGICMARKERS_CURRENT_VERSION = "1.1.1"
+local MAGICMARKERS_CURRENT_VERSION = "1.1.2"
 
 -----------------------------------------------------------------------------------------------
 -- Constants
@@ -473,7 +473,7 @@ function MagicMarkers:CloseMain()
 end
 
 function MagicMarkers:RefreshUI()
-  if self.settings.user.savedWndLoc then
+  if self.settings.user.savedWndLoc and self.state.isLoaded then
     locSavedLoc = WindowLocation.new(self.settings.user.savedWndLoc)
     self.state.windows.main:MoveToLocation(locSavedLoc)
   end

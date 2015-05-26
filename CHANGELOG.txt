@@ -1,3 +1,6 @@
+Version 1.1.2
+* Fixed RefreshUI Load Bug
+
 Version 1.1.1
 * Cleaned up old timer slash command logic
 
