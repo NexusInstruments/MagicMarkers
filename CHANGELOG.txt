@@ -1,0 +1,7 @@
+Version 1.1.1
+* Cleaned up old timer slash command logic
+
+Version 1.1.0
+* Changed the Addon marker update functionality to use a Frame Skipping method instead of a timer
+* Split marker sharing functionality so that raid and party can both be shared to
+* Added options to support both share logic and frame skipping

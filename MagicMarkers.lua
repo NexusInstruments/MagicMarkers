@@ -427,24 +427,10 @@ end
 
 -- on SlashCommand "/mm"
 function MagicMarkers:OnMagicMarkersOn(cmd, params)
-
-    p = string.lower(params)
-
+  p = string.lower(params)
   args = p:split("[ ]+")
 
-  if args[1] == "timer" then
-
-    if #args < 2 then
-      print_cmd("Current update frequency is " .. tostring(self.timerFreq) .. " seconds")
-      return
-    end
-
-    -- So unsafe...
-    self.timerFreq = args[2]
-    self.frameTimer:Set(args[2])
-
-    return
-  elseif args[1] == "defaults" then
+  if args[1] == "defaults" then
     self:LoadDefaultProfiles()
   else
     self:OnToggleMagicMarkers()
