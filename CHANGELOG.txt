@@ -1,3 +1,7 @@
+Version 1.1.3
+* Fixed Comm Channels Logic for groups
+* Fixed sharing to only work when in a group
+
 Version 1.1.2
 * Fixed RefreshUI Load Bug
 

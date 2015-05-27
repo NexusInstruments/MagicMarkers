@@ -13,6 +13,7 @@
 require "Window"
 require "Unit"
 require "GameLib"
+require "GroupLib"
 require "Apollo"
 
 -----------------------------------------------------------------------------------------------
@@ -22,7 +23,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local MAGICMARKERS_CURRENT_VERSION = "1.1.2"
+local MAGICMARKERS_CURRENT_VERSION = "1.1.3"
 
 -----------------------------------------------------------------------------------------------
 -- Constants
@@ -358,11 +359,8 @@ function MagicMarkers:OnLoad()
   Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 
   -- Setup Comms
-  self.shareChannelRaid = ICCommLib.JoinChannel("MagicMarkersRaid", ICCommLib.CodeEnumICCommChannelType.Raid)
-  self.shareChannelRaid:SetReceivedMessageFunction("OnReceiveMarker", self)
-
-  self.shareChannelParty = ICCommLib.JoinChannel("MagicMarkersParty", ICCommLib.CodeEnumICCommChannelType.Party)
-  self.shareChannelParty:SetReceivedMessageFunction("OnReceiveMarker", self)
+  self.shareChannel = ICCommLib.JoinChannel("MagicMarkersRaid", ICCommLib.CodeEnumICCommChannelType.Group)
+  self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
 
   -- Interface Menu
   Apollo.RegisterEventHandler("Generic_ToggleMagicMarkers", "OnToggleMagicMarkers", self)
@@ -536,12 +534,12 @@ function MagicMarkers:ShareMarker(marker)
   if GroupLib.GetMemberCount() > 0 then
     msg = self:MarkerToString(marker)
     -- Sends the Markers to the Raid
-    if self.settings.options.shareMarkerRaid then
-      self.shareChannelRaid:SendMessage(msg)
+    if self.settings.options.shareMarkerRaid and GroupLib.InRaid() then
+      self.shareChannel:SendMessage(msg)
     end
     -- Sends the Markers to the Party
-    if self.settings.options.shareMarekrParty then
-      self.shareChannelParty:SendMessage(msg)
+    if self.settings.options.shareMarekrParty and GroupLib.InGroup() and not GroupLib.InRaid() then
+      self.shareChannel:SendMessage(msg)
     end
   end
 end
