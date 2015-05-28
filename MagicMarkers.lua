@@ -23,7 +23,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local MAGICMARKERS_CURRENT_VERSION = "1.1.3"
+local MAGICMARKERS_CURRENT_VERSION = "1.1.4"
 
 -----------------------------------------------------------------------------------------------
 -- Constants
