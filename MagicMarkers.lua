@@ -359,7 +359,7 @@ function MagicMarkers:OnLoad()
   Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 
   -- Setup Comms
-  self.shareChannel = ICCommLib.JoinChannel("MagicMarkersRaid", ICCommLib.CodeEnumICCommChannelType.Group)
+  self.shareChannel = ICCommLib.JoinChannel("MagicMarkers", ICCommLib.CodeEnumICCommChannelType.Group)
   self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
 
   -- Interface Menu
@@ -538,7 +538,7 @@ function MagicMarkers:ShareMarker(marker)
       self.shareChannel:SendMessage(msg)
     end
     -- Sends the Markers to the Party
-    if self.settings.options.shareMarekrParty and GroupLib.InGroup() and not GroupLib.InRaid() then
+    if self.settings.options.shareMarkerParty and GroupLib.InGroup() and not GroupLib.InRaid() then
       self.shareChannel:SendMessage(msg)
     end
   end
@@ -813,10 +813,18 @@ function MagicMarkers:OnRestore(eType, tSavedData)
     self.settings = deepcopy(tSavedData)
 
     -- Convert old settings
-    if self.settings.user.version == "1.0.0" then
-      self.settings.options.shareMarkerRaid = self.settings.options.shareMarker
-      self.settings.options.shareMarkerParty = true
-      self.settings.options.frameSkip = 2
+    if self.settings.user.version ~= MAGICMARKERS_CURRENT_VERSION then
+      if self.settings.options.shareMarker then
+        self.settings.options.shareMarkerRaid = self.settings.options.shareMarker
+      else
+        self.settings.options.shareMarkerRaid = true
+      end
+      if self.settings.options.shareMarkerParty == nil then
+        self.settings.options.shareMarkerParty = true
+      end
+      if self.settings.options.frameSkip == nil then
+        self.settings.options.frameSkip = 2
+      end
       self.settings.options.shareMarker = nil
     end
 
