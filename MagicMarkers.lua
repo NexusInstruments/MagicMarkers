@@ -303,7 +303,8 @@ local tDefaultState = {
     options = nil,
     overlay = nil
   },
-  activeMarkers = {}
+  activeMarkers = {},
+  debug = false
 }
 
 -----------------------------------------------------------------------------------------------
@@ -427,9 +428,12 @@ end
 function MagicMarkers:OnMagicMarkersOn(cmd, params)
   p = string.lower(params)
   args = p:split("[ ]+")
-
-  if args[1] == "defaults" then
+  local cmd = args[1]
+  if cmd == "defaults" then
     self:LoadDefaultProfiles()
+  elseif cmd == "debug" then
+    self.state.debug = not self.state.debug
+    Utils:cprint("Debug Mode: " .. tostring(self.state.debug))
   else
     self:OnToggleMagicMarkers()
   end
@@ -545,8 +549,11 @@ function MagicMarkers:ShareMarker(marker)
 end
 
 function MagicMarkers:OnReceiveMarker(chan, msg)
-  local markerInfo =	self:GetMarkerInfoFromString(msg)
+  local markerInfo = self:GetMarkerInfoFromString(msg)
   self:SetMarker(markerInfo, markerInfo.loc)
+  if self.state.debug == true then
+    Utils:debug(msg)
+  end
 end
 
 -----------------------------------------------------------------------------------------------
