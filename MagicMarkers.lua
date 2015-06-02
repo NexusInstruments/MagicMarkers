@@ -23,10 +23,8 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local MajorVersion = 1
-local MinorVersion = 1
-local PatchVersion = 5
-local MAGICMARKERS_CURRENT_VERSION = "" .. tostring(MajorVersion) .. "." .. tostring(MinorVersion) .. "." .. tostring(PatchVersion)
+local Major, Minor, Patch, Suffix = 1, 1, 5, 0
+local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
 -- Constants
@@ -409,7 +407,8 @@ end
 -----------------------------------------------------------------------------------------------
 function MagicMarkers:OnInterfaceMenuListHasLoaded()
   Event_FireGenericEvent("InterfaceMenuList_NewAddOn", "MagicMarkers", {"Generic_ToggleMagicMarkers", "", "MagicMarkersSprites:Marker_256"})
-  Event_FireGenericEvent("OneVersion_ReportAddonInfo", "MagicMarkers", MajorVersion, MinorVersion, PatchVersion, false)
+  Event_FireGenericEvent("OneVersion_ReportAddonInfo", "MagicMarkers", Major, Minor, Patch, Suffix, false)
+  --Event_FireGenericEvent("OneVersion_ReportAddonInfo", "MagicMarkers", Major, Minor, Patch)
 end
 
 function MagicMarkers:SetSpritesForButtons()
