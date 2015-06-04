@@ -23,7 +23,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 1, 5, 0
+local Major, Minor, Patch, Suffix = 1, 2, 0, 0
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
@@ -274,6 +274,13 @@ local tDefaultProfiles = {
       [3] = "Ghost;2791.1359863281;-448.78634643555;-145.60018920898;Icon_Windows_UI_CRB_Marker_Ghost",
       [4] = "UFO;2814.9113769531;-448.78454589844;-126.84462738037;Icon_Windows_UI_CRB_Marker_UFO"
     }
+  },
+  [4] = {
+    name = "System Daemons",
+    markers = {
+      [1] = "North;131.63136291504;-223.5594329834;-279.75894165039;MagicMarkersSprites:LetterN_256",
+      [2] = "South;133.46859741211;-222.90234375;-67.640289306641;MagicMarkersSprites:LetterS_256"
+    }
   }
 }
 
@@ -304,6 +311,8 @@ local tDefaultState = {
     options = nil,
     overlay = nil
   },
+  width2 = 1,
+  height2 = 1,
   activeMarkers = {},
   debug = false
 }
@@ -361,8 +370,7 @@ function MagicMarkers:OnLoad()
   Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 
   -- Setup Comms
-  self.shareChannel = ICCommLib.JoinChannel("MagicMarkers", ICCommLib.CodeEnumICCommChannelType.Group)
-  self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
+  self:UpdateCommChannel()
 
   -- Interface Menu
   Apollo.RegisterEventHandler("Generic_ToggleMagicMarkers", "OnToggleMagicMarkers", self)
@@ -388,13 +396,8 @@ function MagicMarkers:OnDocLoaded()
   -- Register handlers for events, slash commands and timer, etc.
   Apollo.RegisterSlashCommand("mm", "OnMagicMarkersOn", self)
 
-  -- This update event is strange, and fires off intermittently
-  -- Apollo.RegisterEventHandler("VarChange_FrameCount", "OnNextFrame", self)
   -- This update event is smooth, but probably horribly inefficient
   Apollo.RegisterEventHandler("NextFrame", "OnNextFrame", self)
-  -- This update event is customizable, but still doesn't fix fps lag
-  --self.timerFreq = .03
-  --self.frameTimer = ApolloTimer.Create(self.timerFreq, true, "OnNextFrame", self)
 
   -- Do additional Addon initialization here
   self.state.windows.main:Show(self.state.isOpen, true)
@@ -408,18 +411,6 @@ end
 function MagicMarkers:OnInterfaceMenuListHasLoaded()
   Event_FireGenericEvent("InterfaceMenuList_NewAddOn", "MagicMarkers", {"Generic_ToggleMagicMarkers", "", "MagicMarkersSprites:Marker_256"})
   Event_FireGenericEvent("OneVersion_ReportAddonInfo", "MagicMarkers", Major, Minor, Patch, Suffix, false)
-  --Event_FireGenericEvent("OneVersion_ReportAddonInfo", "MagicMarkers", Major, Minor, Patch)
-end
-
-function MagicMarkers:SetSpritesForButtons()
-  sprite = {}
-  sprite.w = 34
-  sprite.h = 34
-
-  for i = 1, self.markers do
-    local marker = self.markers[i]
-    lof:info("Set marker " .. marker[0])
-  end
 end
 
 -----------------------------------------------------------------------------------------------
@@ -500,7 +491,7 @@ end
 
 function MagicMarkers:DrawMarkers()
   for key, marker in pairs(self.state.activeMarkers) do
-    local pixie = self:GenerateMarkerPixie(marker)
+    local pixie = self:GenerateMarkerPixie(marker, self.state.width2, self.state.height2)
     self.state.windows.overlay:UpdatePixie(marker.pixieId, pixie)
   end
 end
@@ -518,7 +509,7 @@ function MagicMarkers:SetMarker(marker, loc)
 
   -- set new marker
   marker.location = loc
-  local pixie = self:GenerateMarkerPixie(marker)
+  local pixie = self:GenerateMarkerPixie(marker, self.state.width2, self.state.height2)
   marker.pixieId = self.state.windows.overlay:AddPixie(pixie) -- safe pixie id for position updates
   table.insert(self.state.activeMarkers, marker)
 
@@ -540,13 +531,22 @@ end
 function MagicMarkers:ShareMarker(marker)
   if GroupLib.GetMemberCount() > 0 then
     msg = self:MarkerToString(marker)
+    if self.state.debug == true then
+      Utils:debug("Test: " .. tostring(self.settings.options.shareMarkerRaid) .. ":" .. tostring(self.settings.options.shareMarkerParty))
+    end
     -- Sends the Markers to the Raid
     if self.settings.options.shareMarkerRaid and GroupLib.InRaid() then
-      self.shareChannel:SendMessage(msg)
+      if self.state.debug == true then
+        Utils:debug("Share Raid: " .. msg)
+      end
+      self:SendMessage(msg)
     end
     -- Sends the Markers to the Party
     if self.settings.options.shareMarkerParty and GroupLib.InGroup() and not GroupLib.InRaid() then
-      self.shareChannel:SendMessage(msg)
+      if self.state.debug == true then
+        Utils:debug("Share Party: " .. msg)
+      end
+      self:SendMessage(msg)
     end
   end
 end
@@ -556,6 +556,30 @@ function MagicMarkers:OnReceiveMarker(chan, msg)
   self:SetMarker(markerInfo, markerInfo.loc)
   if self.state.debug == true then
     Utils:debug(msg)
+  end
+end
+
+function MagicMarkers:UpdateCommChannel()
+  if not self.shareChannel then
+    self.shareChannel = ICCommLib.JoinChannel("MagicMarkers", ICCommLib.CodeEnumICCommChannelType.Group)
+  end
+
+  if self.shareChannel:IsReady() then
+    self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
+  else
+    -- Channel not ready yet, repeat in a few seconds
+    Apollo.CreateTimer("UpdateCommChannel", 1, false)
+    Apollo.StartTimer("UpdateCommChannel")
+  end
+end
+
+function MagicMarkers:SendMessage(msg)
+  if not self.shareChannel then
+      Print("[MagicMarkers] Error sending Markers. Attempting to fix this now. If this issue persists, contact the developers")
+      self:UpdateCommChannel()
+      return false
+  else
+      self.shareChannel:SendMessage(msg)
   end
 end
 
@@ -573,20 +597,18 @@ function MagicMarkers:GetMarkerIndex(marker)
 end
 
 -- copied from WorldMarkers
-function MagicMarkers:GenerateMarkerPixie(marker)
+function MagicMarkers:GenerateMarkerPixie(marker, xoffset, yoffset)
   local loc =  GameLib.WorldLocToScreenPoint(marker.location)
-  local w = self.settings.options.buttons.w /2
-  local h = self.settings.options.buttons.h /2
   return {
     strSprite = marker.sprite,
     cr = "FFFFFFFF",
     loc = {
       fPoints = { 0, 0, 0, 0 },
       nOffsets = {
-        loc.x-(w),
-        loc.y-(h),
-        loc.x+(w),
-        loc.y+(h)
+        loc.x-(xoffset),
+        loc.y-(yoffset),
+        loc.x+(xoffset),
+        loc.y+(yoffset)
       }
     }
   }
@@ -644,6 +666,8 @@ function MagicMarkers:OnChangeMarkerSize(wndHandler, wndControl, strText)
   if value ~= nil then
     self.settings.options.buttons.w = value
     self.settings.options.buttons.h = value
+    self.state.width2 = bit32.rshift(self.settings.options.buttons.w,1)
+    self.state.height2 = bit32.rshift(self.settings.options.buttons.w,1)
   else
     wndControl:SetText(tostring(self.settings.options.buttons.w))
   end
@@ -852,6 +876,8 @@ function MagicMarkers:OnRestore(eType, tSavedData)
     end
 
     self.settings.user.version = MAGICMARKERS_CURRENT_VERSION
+    self.state.width2 = bit32.rshift(self.settings.options.buttons.w,1)
+    self.state.height2 = bit32.rshift(self.settings.options.buttons.w,1)
 
     self:RefreshUI()
   end

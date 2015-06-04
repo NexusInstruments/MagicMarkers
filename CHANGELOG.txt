@@ -1,18 +1,29 @@
-Version 1.1.4
+# Version 1.2.0
+* Major optimization for inner draw loop
+* Added Default Marks for System Daemons
+* Changed Comm channel initialization to be more reliable
+
+# Version 1.1.6
+* Updated OneVersion Support
+
+# Version 1.1.5
+* Added OneVersion Support
+
+# Version 1.1.4
 * Added debug slash command
 * Change the Comm Channel name
 
-Version 1.1.3
+# Version 1.1.3
 * Fixed Comm Channels Logic for groups
 * Fixed sharing to only work when in a group
 
-Version 1.1.2
+# Version 1.1.2
 * Fixed RefreshUI Load Bug
 
-Version 1.1.1
+# Version 1.1.1
 * Cleaned up old timer slash command logic
 
-Version 1.1.0
+# Version 1.1.0
 * Changed the Addon marker update functionality to use a Frame Skipping method instead of a timer
 * Split marker sharing functionality so that raid and party can both be shared to
 * Added options to support both share logic and frame skipping
