@@ -15,15 +15,21 @@ require "Unit"
 require "GameLib"
 require "GroupLib"
 require "Apollo"
+require "ICComm"
 
 -----------------------------------------------------------------------------------------------
 -- MagicMarkers Module Definition
 -----------------------------------------------------------------------------------------------
+local CommAttemptDelay = 3 -- The delay between attempts to load channel
+local MaxCommAttempts = 10 -- The number of attempts made to connect to Comm Channel before abandoning
+local CommChannelName = "MagicMarkersChannel" -- The channel name
+local CommChannelTimer = nil
+
 local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 2, 0, 0
+local Major, Minor, Patch, Suffix = 1, 3, 0, 0
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
@@ -311,10 +317,17 @@ local tDefaultState = {
     options = nil,
     overlay = nil
   },
+  channel = {
+    attemptsCount = 0,
+    timerActive = false,
+    ready = false
+  },
   width2 = 1,
   height2 = 1,
   activeMarkers = {},
-  debug = false
+  debug = false,
+  messageQueue = {}
+
 }
 
 -----------------------------------------------------------------------------------------------
@@ -365,12 +378,10 @@ function MagicMarkers:OnLoad()
   -- load our form file
   self.xmlDoc = XmlDoc.CreateFromFile("MagicMarkers.xml")
   self.xmlDoc:RegisterCallback("OnDocLoaded", self)
+  self.state.timerActive = true
 
   -- Load Utils
   Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
-
-  -- Setup Comms
-  self:UpdateCommChannel()
 
   -- Interface Menu
   Apollo.RegisterEventHandler("Generic_ToggleMagicMarkers", "OnToggleMagicMarkers", self)
@@ -385,6 +396,8 @@ function MagicMarkers:OnDocLoaded()
     return
   end
 
+  self.shareChannel = nil
+
   self.state.windows.main = Apollo.LoadForm(self.xmlDoc, "MagicMarkers", nil, self)
   self.state.windows.options = Apollo.LoadForm(self.xmlDoc, "MagicMarkersOptions", nil, self)
   self.state.windows.overlay = Apollo.LoadForm(self.xmlDoc, "Overlay", nil, self)
@@ -392,6 +405,10 @@ function MagicMarkers:OnDocLoaded()
     Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
     return
   end
+
+  -- Setup Comms
+  Apollo.RegisterTimerHandler("MagicMarkers_UpdateCommChannel", "UpdateCommChannel", self)
+  CommChannelTimer = ApolloTimer.Create(5, false, "UpdateCommChannel", self) -- make sure everything is loaded, so after 5sec
 
   -- Register handlers for events, slash commands and timer, etc.
   Apollo.RegisterSlashCommand("mm", "OnMagicMarkersOn", self)
@@ -531,21 +548,14 @@ end
 function MagicMarkers:ShareMarker(marker)
   if GroupLib.GetMemberCount() > 0 then
     msg = self:MarkerToString(marker)
-    if self.state.debug == true then
-      Utils:debug("Test: " .. tostring(self.settings.options.shareMarkerRaid) .. ":" .. tostring(self.settings.options.shareMarkerParty))
-    end
     -- Sends the Markers to the Raid
     if self.settings.options.shareMarkerRaid and GroupLib.InRaid() then
-      if self.state.debug == true then
-        Utils:debug("Share Raid: " .. msg)
-      end
+      self:DBPrint("(ShareRaid) " .. msg)
       self:SendMessage(msg)
     end
     -- Sends the Markers to the Party
     if self.settings.options.shareMarkerParty and GroupLib.InGroup() and not GroupLib.InRaid() then
-      if self.state.debug == true then
-        Utils:debug("Share Party: " .. msg)
-      end
+      self:DBPrint("(ShareParty) " .. msg)
       self:SendMessage(msg)
     end
   end
@@ -554,33 +564,73 @@ end
 function MagicMarkers:OnReceiveMarker(chan, msg)
   local markerInfo = self:GetMarkerInfoFromString(msg)
   self:SetMarker(markerInfo, markerInfo.loc)
-  if self.state.debug == true then
-    Utils:debug(msg)
-  end
+  self:DBPrint("(RecieveMarker) " .. msg)
 end
 
 function MagicMarkers:UpdateCommChannel()
   if not self.shareChannel then
-    self.shareChannel = ICCommLib.JoinChannel("MagicMarkers", ICCommLib.CodeEnumICCommChannelType.Group)
+    self:DBPrint(" InitComms")
+    self.shareChannel = ICCommLib.JoinChannel(CommChannelName, ICCommLib.CodeEnumICCommChannelType.Group)
+    self.shareChannel:SetJoinResultFunction("OnCommJoin", self)
   end
 
   if self.shareChannel:IsReady() then
+    self:DBPrint(" Channel is ready." )
     self.shareChannel:SetReceivedMessageFunction("OnReceiveMarker", self)
+    self.shareChannel:SetSendMessageResultFunction("OnMessageSent", self)
+    self.shareChannel:SetThrottledFunction("OnChannelThrottle", self)
+    self.state.channel.ready = true
+
+    -- Check the message queue and push waiting messages
+    while #self.state.messageQueue > 0 do
+      self:SendMessage(self.state.messageQueue[1])
+      table.remove(self.state.messageQueue, 1)
+    end
   else
+    self:DBPrint(" Channel is not ready, retrying.")
     -- Channel not ready yet, repeat in a few seconds
-    Apollo.CreateTimer("UpdateCommChannel", 1, false)
-    Apollo.StartTimer("UpdateCommChannel")
+    if self.state.channel.attemptsCount < MaxCommAttempts then
+      self.state.timerActive = true
+      Apollo.CreateTimer("MagicMarkers_UpdateCommChannel", CommAttemptDelay, false)
+      Apollo.StartTimer("MagicMarkers_UpdateCommChannel")
+    else
+      -- Comms disabled, send alert
+      self.state.timerActive = false
+      Utils:cprint("[MagicMarkers] Could not initialize comm channel.  Group Comm channels appear to be disabled -- please open a ticket with Carbine.")
+    end
+    -- Increment the number of attempts
+    self.state.channel.attemptsCount = self.state.channel.attemptsCount + 1
   end
 end
 
 function MagicMarkers:SendMessage(msg)
-  if not self.shareChannel then
-      Print("[MagicMarkers] Error sending Markers. Attempting to fix this now. If this issue persists, contact the developers")
+  self:DBPrint("(SendMessage)" .. msg )
+  if not self.shareChannel or not self.state.channel.ready then
+    -- Reinitialize only if the timer is not active
+    if not self.state.timerActive then
+      self:DBPrint(" Error sending Markers. Attempting to fix this now.")
+      -- Attempt to re-initialize chanel
+      self.state.channel.attemptsCount = 0
       self:UpdateCommChannel()
-      return false
+    end
+    -- Queue the message
+    table.insert(self.state.messageQueue, msg)
+    return false
   else
-      self.shareChannel:SendMessage(msg)
+    return self.shareChannel:SendMessage(msg)
   end
+end
+
+function MagicMarkers:OnCommJoin(channel, eResult)
+  self:DBPrint( string.format("(JoinResult) %s:%s", channel:GetName(), tostring(eResult)) )
+end
+
+function MagicMarkers:OnMessageSent(channel, eResult, idMessage)
+  self:DBPrint( string.format("(MessageResult) %s:%s", channel:GetName(), tostring(eResult)) )
+end
+
+function MagicMarkers:OnChannelThrottle(channel, strSender, idMessage)
+  self:DBPrint( string.format("(ChannelThrottle) %s:%s:%s", channel:GetName(), strSender, tostring(idMessage) ) )
 end
 
 -----------------------------------------------------------------------------------------------
@@ -886,6 +936,12 @@ end
 function MagicMarkers:LoadDefaultProfiles()
   self.settings.savedProfiles = deepcopy(tDefaultProfiles)
   self:LoadProfileOptions()
+end
+
+function MagicMarkers:DBPrint(msg)
+  if self.settings.user.debug then
+    Utils:debug( "[MagicMarkers]" .. msg )
+  end
 end
 
 -----------------------------------------------------------------------------------------------

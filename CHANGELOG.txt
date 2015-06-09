@@ -1,3 +1,11 @@
+# Version 1.3.0
+* Fixed Comm channel initialization to be on a delay
+* Fixed Comm channel re-initialization to limit number of failed attempts before alerting and quiting
+* Added message queuing for when comm channel is not active
+* Fixed Timer event
+* Added Comm debug functions
+* Added DBPrint utilty function
+
 # Version 1.2.0
 * Major optimization for inner draw loop
 * Added Default Marks for System Daemons
