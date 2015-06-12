@@ -287,6 +287,27 @@ local tDefaultProfiles = {
       [1] = "North;131.63136291504;-223.5594329834;-279.75894165039;MagicMarkersSprites:LetterN_256",
       [2] = "South;133.46859741211;-222.90234375;-67.640289306641;MagicMarkersSprites:LetterS_256"
     }
+  },
+  [5] = {
+    name = "Core Y-83",
+    markers = {
+      [1] = "Bomb;2814.2836914063;-448.78671264648;-105.99939727783;Icon_Windows_UI_CRB_Marker_Bomb",
+      [2] = "Chicken;2774.5405273438;-448.78659057617;-108.68078613281;Icon_Windows_UI_CRB_Marker_Chicken",
+      [3] = "Ghost;2791.1359863281;-448.78634643555;-145.60018920898;Icon_Windows_UI_CRB_Marker_Ghost",
+      [4] = "UFO;2814.9113769531;-448.78454589844;-126.84462738037;Icon_Windows_UI_CRB_Marker_UFO",
+      [5] = "Planet;1252.095703125;-800.50634765625;885.97393798828;MagicMarkersSprites:Planet_256",
+      [6] = "Star;1268.5686035156;-800.50775146484;859.26635742188;MagicMarkersSprites:Star_256",
+      [7] = "Moon;1283.7844238281;-800.50982666016;886.46051025391;MagicMarkersSprites:Moon_256",
+      [8] = "Number_1;1242.1364746094;-800.51348876953;815.38665771484;sprFloater_Critical1",
+      [9] = "Number_3;1268.6258544922;-800.50445556641;800.20007324219;sprFloater_Critical3",
+      [10] = "Number_2;1294.5014648438;-800.50897216797;815.40576171875;sprFloater_Critical2",
+      [11] = "Number_4;1334.7492675781;-800.51428222656;885.82275390625;sprFloater_Critical4",
+      [12] = "Number_6;1335.1800537109;-800.51544189453;915.98394775391;sprFloater_Critical6",
+      [13] = "Number_5;1308.4053955078;-800.51605224609;931.09381103516;sprFloater_Critical5",
+      [14] = "Number_7;1227.3753662109;-800.5107421875;931.19451904297;sprFloater_Critical7",
+      [15] = "Number_9;1200.9818115234;-800.50347900391;914.85766601563;sprFloater_Critical9",
+      [16] = "Number_8;1201.0769042969;-800.51275634766;885.13397216797;sprFloater_Critical8",
+    }
   }
 }
 
