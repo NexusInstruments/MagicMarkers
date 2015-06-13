@@ -29,7 +29,7 @@ local MagicMarkers = {}
 local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 3, 0, 0
+local Major, Minor, Patch, Suffix = 1, 3, 1, 1
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
