@@ -26,7 +26,8 @@ local CommChannelName = "MagicMarkersChannel" -- The channel name
 local CommChannelTimer = nil
 
 local MagicMarkers = {}
-local Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
+local Utils = Apollo.GetPackage("SimpleUtils").tPackage
+local RaidMemberHelper = Apollo.GetPackage("RaidMemberHelper").tPackage
 local log
 
 local Major, Minor, Patch, Suffix = 1, 3, 1, 1
@@ -360,9 +361,9 @@ function MagicMarkers:new(o)
   self.__index = self
 
   -- Saved and Restored values are stored here.
-  o.settings = shallowcopy(tDefaultSettings)
+  o.settings = deepcopy(tDefaultSettings)
   -- Volatile values are stored here. These are impermenant and not saved between sessions
-  o.state = shallowcopy(tDefaultState)
+  o.state = deepcopy(tDefaultState)
 
   return o
 end
@@ -378,9 +379,9 @@ function MagicMarkers:Init()
   Apollo.RegisterAddon(self, bHasConfigureFunction, strConfigureButtonText, tDependencies)
 
   -- Saved and Restored values are stored here.
-  self.settings = shallowcopy(tDefaultSettings)
+  self.settings = deepcopy(tDefaultSettings)
   -- Volatile values are stored here. These are impermenant and not saved between sessions
-  self.state = shallowcopy(tDefaultState)
+  self.state = deepcopy(tDefaultState)
 end
 
 -----------------------------------------------------------------------------------------------
