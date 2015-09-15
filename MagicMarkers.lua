@@ -290,6 +290,56 @@ local tDefaultProfiles = {
     }
   },
   [5] = {
+    name = "Limbo Infomatrix",
+    markers = {
+        [1]  = "Ghost;-10005.637695313;-727.08416748047;-16353.180664063;Icon_Windows_UI_CRB_Marker_Ghost",
+        [2]  = "Mask;-9706.37109375;-726.33465576172;-16447.697265625;Icon_Windows_UI_CRB_Marker_Mask",
+        [3]  = "Number_1;-9891.4521484375;-724.70965576172;-16559.23046875;sprFloater_Critical1",
+        [4]  = "Number_2;-9855.919921875;-723.82641601563;-16363.112304688;sprFloater_Critical2",
+        [5]  = "North;-9827.201171875;-719.77172851563;-16627.810546875;MagicMarkersSprites:LetterN_256",
+        [6]  = "Number_9;-9980.1240234375;-709.23016357422;-16491.849609375;sprFloater_Critical9",
+        [7]  = "Number_8;-9951.8486328125;-723.30963134766;-16211.5859375;sprFloater_Critical8",
+        [8]  = "South;-9725.1240234375;-713.86016845703;-16122.1796875;MagicMarkersSprites:LetterS_256",
+        [9]  = "Moon;-9502.2080078125;-711.69409179688;-16303.55078125;MagicMarkersSprites:Moon_256",
+        [10] = "Star;-9551.3115234375;-716.08087158203;-16541.69140625;MagicMarkersSprites:Star_256",
+        [11] = "OldGreg;-9979;-709.26086425781;-16491.10546875;MagicMarkersSprites:OldGreg_256",
+        [12] = "Planet;-9950.8681640625;-723.32281494141;-16211.50390625;MagicMarkersSprites:Planet_256",
+    }
+  },
+  [6] = {
+    name = "Volatility Lattice",
+    markers = {
+      [1]  = "Star;16796.3984375;-370.70474243164;-17570.611328125;MagicMarkersSprites:Star_256",
+      [2]  = "Planet;16792.6796875;-370.70474243164;-17570.720703125;MagicMarkersSprites:Planet_256",
+      [3]  = "Moon;16799.857421875;-370.70852661133;-17570.71484375;MagicMarkersSprites:Moon_256",
+      [4]  = "OldGreg;16796.8125;-370.70852661133;-17566.9921875;MagicMarkersSprites:OldGreg_256",
+      [5]  = "Number_0;16796.515625;-370.69854736328;-17574.708984375;sprFloater_Critical0",
+      [6]  = "Number_3;16818.53125;-370.69644165039;-17566.57421875;sprFloater_Critical3",
+      [7]  = "Number_1;16758.015625;-370.69497680664;-17506.205078125;sprFloater_Critical1",
+      [8]  = "North;16813.361328125;-366.65243530273;-17665.01171875;MagicMarkersSprites:LetterN_256",
+      [9]  = "West;16755.8203125;-366.84378051758;-17605.662109375;MagicMarkersSprites:LetterW_256",
+      [10] = "East;16836.908203125;-366.31011962891;-17579.837890625;MagicMarkersSprites:LetterE_256",
+      [11] = "South;16780.10546875;-364.60528564453;-17519.517578125;MagicMarkersSprites:LetterS_256",
+      [12] = "Pig;16799.857421875;-370.7004699707;-17513.958984375;Icon_Windows_UI_CRB_Marker_Pig",
+      [13] = "UFO;16800.41796875;-370.69464111328;-17686.16796875;Icon_Windows_UI_CRB_Marker_UFO",
+      [14] = "Number_4;16757.890625;-370.70269775391;-17566.7890625;sprFloater_Critical4",
+      [15] = "Number_2;16818.01171875;-370.69467163086;-17506.880859375;sprFloater_Critical2",
+      [16] = "Number_5;16826.384765625;-370.69201660156;-17635.228515625;sprFloater_Critical5",
+      [17] = "Number_6;16758.177734375;-370.70462036133;-17635.1328125;sprFloater_Critical6",
+      [18] = "Number_7;16757.642578125;-370.69705200195;-17686.470703125;sprFloater_Critical7",
+      [19] = "Number_8;16826.857421875;-370.69714355469;-17686.162109375;sprFloater_Critical8"
+    }
+  },
+  [7] = {
+    name = "Maelstrom Authority",
+    markers = {
+      [1] = "North;7290.00000;-250.00000;-13120.00000;MagicMarkersSprites:LetterN_256",
+      [2] = "West;7040.0000;-250.00000;-12600.00000;MagicMarkersSprites:LetterW_256",
+      [3] = "East;7530.0000;-250.00000;-12600.00000;MagicMarkersSprites:LetterE_256",
+      [4] = "South;7290.00000;-250.00000;-12080.00000;MagicMarkersSprites:LetterS_256"
+    }
+  },
+  [8] = {
     name = "Core Y-83",
     markers = {
       [1] = "Bomb;2814.2836914063;-448.78671264648;-105.99939727783;Icon_Windows_UI_CRB_Marker_Bomb",
@@ -307,7 +357,7 @@ local tDefaultProfiles = {
       [13] = "Number_5;1308.4053955078;-800.51605224609;931.09381103516;sprFloater_Critical5",
       [14] = "Number_7;1227.3753662109;-800.5107421875;931.19451904297;sprFloater_Critical7",
       [15] = "Number_9;1200.9818115234;-800.50347900391;914.85766601563;sprFloater_Critical9",
-      [16] = "Number_8;1201.0769042969;-800.51275634766;885.13397216797;sprFloater_Critical8",
+      [16] = "Number_8;1201.0769042969;-800.51275634766;885.13397216797;sprFloater_Critical8"
     }
   }
 }
@@ -571,7 +621,7 @@ function MagicMarkers:ShareMarker(marker)
   if GroupLib.GetMemberCount() > 0 then
     msg = self:MarkerToString(marker)
     -- Sends the Markers to the Raid
-    if self.settings.options.shareMarkerRaid and GroupLib.InRaid() then
+    if self.settings.options.shareMarkerRaid and GroupLib.InRaid() and RaidMemberHelper:CanMark() then
       self:DBPrint("(ShareRaid) " .. msg)
       self:SendMessage(msg)
     end
@@ -585,8 +635,12 @@ end
 
 function MagicMarkers:OnReceiveMarker(chan, msg)
   local markerInfo = self:GetMarkerInfoFromString(msg)
-  self:SetMarker(markerInfo, markerInfo.loc)
-  self:DBPrint("(RecieveMarker) " .. msg)
+  if not markerInfo then
+    self:SetMarker(markerInfo, markerInfo.loc)
+    self:DBPrint("(RecieveMarker) " .. msg)
+  else -- Message to reset all markers
+    self:ResetAllMarker()
+  end
 end
 
 function MagicMarkers:UpdateCommChannel()
@@ -618,7 +672,7 @@ function MagicMarkers:UpdateCommChannel()
     else
       -- Comms disabled, send alert
       self.state.timerActive = false
-      Utils:cprint("[MagicMarkers] Could not initialize comm channel.  Group Comm channels appear to be disabled -- please open a ticket with Carbine.")
+      Utils:cprint("[MagicMarkers] Could not initialize comm channel. Group Comm channels appear to be disabled -- please open a ticket with Carbine.")
     end
     -- Increment the number of attempts
     self.state.channel.attemptsCount = self.state.channel.attemptsCount + 1
@@ -692,19 +746,24 @@ function MagicMarkers:MarkerToString(marker)
       .. ";" .. marker.sprite
 end
 
-function MagicMarkers:GetMarkerInfoFromString(string)
+function MagicMarkers:GetMarkerInfoFromString(str)
   local marker = {}
   local counter = 1
-  for coord in string.gmatch(string, '([^;]+)') do
-      marker[counter] = coord
-    counter = counter + 1
-  end
 
-  return {
-    loc = Vector3.New(marker[2],marker[3],marker[4]),
-    name = marker[1],
-    sprite = marker[5]
-  }
+  if string.find(str, "clear-all") then
+    return nil
+  else
+    for coord in string.gmatch(str, '([^;]+)') do
+        marker[counter] = coord
+      counter = counter + 1
+    end
+
+    return {
+      loc = Vector3.New(marker[2],marker[3],marker[4]),
+      name = marker[1],
+      sprite = marker[5]
+    }
+  end
 end
 
 -----------------------------------------------------------------------------------------------
@@ -894,6 +953,17 @@ function MagicMarkers:ResetMarker(wndHandler, wndControl, eMouseButton)
   self:ClearMarker(marker)
   table.remove(self.state.activeMarkers, self:GetMarkerIndex(marker)
 )
+end
+
+function MagicMarkers:OnResetAllMarker()
+  if GroupLib.GetMemberCount() > 0 then
+    -- Sends the all clear to the raid
+    if self.settings.options.shareMarkerRaid and GroupLib.InRaid() and RaidMemberHelper:CanMark() then
+      self:DBPrint("(ShareRaid) Clear-All")
+      self:SendMessage("clear-all")
+    end
+  end
+  self:ResetAllMarker()
 end
 
 function MagicMarkers:ResetAllMarker()
