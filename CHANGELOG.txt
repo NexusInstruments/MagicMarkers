@@ -1,3 +1,9 @@
+# Version 1.4.0
+* Added Raid Leader / Raid Assist sanity control with marks.
+** Now only raiders who can mark can share markers with raid.
+** Raiders who can share marks can also send a "clear all marks" signal to the raid when pressing the "Reset All Marks"
+* Added Profile for Limbo Infomatrix, Volatility Lattice, and Maelstrom Authority
+
 # Version 1.3.1
 * Added Initialization Core Y-83 Profile
 
