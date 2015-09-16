@@ -30,7 +30,7 @@ local Utils = Apollo.GetPackage("SimpleUtils").tPackage
 local RaidMemberHelper = Apollo.GetPackage("RaidMemberHelper").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 3, 1, 1
+local Major, Minor, Patch, Suffix = 1, 4, 0, 0
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------

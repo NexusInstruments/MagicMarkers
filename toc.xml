@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Addon Author="Chronosis" APIVersion="11" Name="MagicMarkers" Description="Zin Markers Replacement">
+<Addon Author="Chronosis" APIVersion="10" Name="MagicMarkers" Description="Zin Markers Replacement">
   <Script Name="libs\SimpleUtils\SimpleUtils.lua"/>
   <Script Name="libs\RaidMemberHelper\RaidMemberHelper.lua"/>
   <Script Name="libs\GeminiLogging.lua"/>
