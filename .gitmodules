@@ -1,6 +1,3 @@
 [submodule "libs/SimpleUtils"]
 	path = libs/SimpleUtils
 	url = https://github.com/NexusInstruments/SimpleUtils
-[submodule "libs/RaidMemberHelper"]
-	path = libs/RaidMemberHelper
-	url = https://github.com/NexusInstruments/RaidMemberHelper.git
