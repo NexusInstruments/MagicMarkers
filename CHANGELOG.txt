@@ -1,3 +1,7 @@
+# Version 1.5.0
+* Updated API Version to 11
+* Temporarily disabled the "Clear All Marks" message behaving strangely with raid leaders
+
 # Version 1.4.0
 * Added Raid Leader / Raid Assist sanity control with marks.
 ** Now only raiders who can mark can share markers with raid.
