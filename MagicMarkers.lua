@@ -30,7 +30,7 @@ local Utils = Apollo.GetPackage("SimpleUtils").tPackage
 local RaidMemberHelper = Apollo.GetPackage("RaidMemberHelper").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 4, 0, 0
+local Major, Minor, Patch, Suffix = 1, 5, 0, 0
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
@@ -872,6 +872,8 @@ function MagicMarkers:LoadProfile(wndHandler, wndControl, eMouseButton)
       profile = temp
     end
   end
+  --TODO: This is the issue, Raid Leaders would clobber each others marks
+  --Need to elegantly Reset Marks without sending clobber information
   self:ResetAllMarker()
   for key, markerString in pairs(profile.markers) do
     local markerInfo = self:GetMarkerInfoFromString(markerString)
@@ -958,10 +960,11 @@ end
 function MagicMarkers:OnResetAllMarker()
   if GroupLib.GetMemberCount() > 0 then
     -- Sends the all clear to the raid
-    if self.settings.options.shareMarkerRaid and GroupLib.InRaid() and RaidMemberHelper:CanMark() then
-      self:DBPrint("(ShareRaid) Clear-All")
-      self:SendMessage("clear-all")
-    end
+    --TODO: Fix this bug
+    --if self.settings.options.shareMarkerRaid and GroupLib.InRaid() and RaidMemberHelper:CanMark() then
+    --  self:DBPrint("(ShareRaid) Clear-All")
+    --  self:SendMessage("clear-all")
+    --end
   end
   self:ResetAllMarker()
 end
