@@ -30,7 +30,7 @@ local Utils = Apollo.GetPackage("SimpleUtils").tPackage
 local RaidMemberHelper = Apollo.GetPackage("RaidMemberHelper").tPackage
 local log
 
-local Major, Minor, Patch, Suffix = 1, 5, 0, 0
+local Major, Minor, Patch, Suffix = 1, 5, 1, 0
 local MAGICMARKERS_CURRENT_VERSION = string.format("%d.%d.%d", Major, Minor, Patch)
 
 -----------------------------------------------------------------------------------------------
@@ -451,9 +451,6 @@ function MagicMarkers:OnLoad()
   self.xmlDoc = XmlDoc.CreateFromFile("MagicMarkers.xml")
   self.xmlDoc:RegisterCallback("OnDocLoaded", self)
   self.state.timerActive = true
-
-  -- Load Utils
-  Utils = Apollo.GetPackage("SimpleUtils-1.0").tPackage
 
   -- Interface Menu
   Apollo.RegisterEventHandler("Generic_ToggleMagicMarkers", "OnToggleMagicMarkers", self)
