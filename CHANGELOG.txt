@@ -1,6 +1,11 @@
+# Version 1.5.1
+* Fixed SimpleUtils load issue
+
+
 # Version 1.5.0
 * Updated API Version to 11
 * Temporarily disabled the "Clear All Marks" message behaving strangely with raid leaders
+
 
 # Version 1.4.0
 * Added Raid Leader / Raid Assist sanity control with marks.
@@ -8,8 +13,10 @@
 ** Raiders who can share marks can also send a "clear all marks" signal to the raid when pressing the "Reset All Marks"
 * Added Profile for Limbo Infomatrix, Volatility Lattice, and Maelstrom Authority
 
+
 # Version 1.3.1
 * Added Initialization Core Y-83 Profile
+
 
 # Version 1.3.0
 * Fixed Comm channel initialization to be on a delay
@@ -19,30 +26,38 @@
 * Added Comm debug functions
 * Added DBPrint utilty function
 
+
 # Version 1.2.0
 * Major optimization for inner draw loop
 * Added Default Marks for System Daemons
 * Changed Comm channel initialization to be more reliable
 
+
 # Version 1.1.6
 * Updated OneVersion Support
 
+
 # Version 1.1.5
 * Added OneVersion Support
+
 
 # Version 1.1.4
 * Added debug slash command
 * Change the Comm Channel name
 
+
 # Version 1.1.3
 * Fixed Comm Channels Logic for groups
 * Fixed sharing to only work when in a group
 
+
 # Version 1.1.2
 * Fixed RefreshUI Load Bug
 
+
 # Version 1.1.1
 * Cleaned up old timer slash command logic
+
 
 # Version 1.1.0
 * Changed the Addon marker update functionality to use a Frame Skipping method instead of a timer
