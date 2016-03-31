@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Addon Author="Chronosis" APIVersion="11" Name="MagicMarkers" Description="Ground Markers for Raids and Groups">
+<Addon Author="Chronosis" APIVersion="12" Name="MagicMarkers" Description="Ground Markers for Raids and Groups">
   <Script Name="libs\SimpleUtils\SimpleUtils.lua"/>
   <Script Name="libs\RaidMemberHelper\RaidMemberHelper.lua"/>
   <Script Name="libs\GeminiLogging.lua"/>
